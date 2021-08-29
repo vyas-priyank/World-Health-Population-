@@ -48,7 +48,7 @@ group by country_name,year
 order by Min_Mortality_rate desc
 ```
 
-#health expenditure of the company where mortality rate is higher than global average
+#health expenditure of the country where mortality rate is higher than global average in 2017
 
 ```sql
 
@@ -81,3 +81,21 @@ and year = 2017
 order by health_expenditure_per_capita desc
 
 ```
+# Country which has the highest level of HIV incidence and in which year
+```sql
+
+SELECT
+country_name,
+ 
+max(value) as  Incidence_of_HIV
+from`bigquery-public-data.world_bank_health_population.health_nutrition_population`
+where indicator_name = 'Incidence of HIV, all (per 1,000 uninfected population)'
+and value   > 0 
+group by  country_name
+order by Incidence_of_HIV desc
+limit 1
+
+```
+
+
+
