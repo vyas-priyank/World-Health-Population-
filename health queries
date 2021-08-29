@@ -1,0 +1,83 @@
+# World Health_Nutrition Dataset
+
+# Average Birth Rate in Various Countries arranged in descending with maximum and minimum birth rate recorded
+```sql
+
+SELECT 
+country_name,
+avg(value) as Birth_rate
+FROM `bigquery-public-data.world_bank_health_population.health_nutrition_population` 
+where indicator_name = 'Birth rate, crude (per 1,000 people)'
+and indicator_name ='Mortality rate, infant (per 1,000 live births)'
+group by country_name
+order by Birth_rate desc
+
+```
+Ans.
+
+##Which Countries has the highest birth rate
+
+
+
+#Countries with Highest Average Mortality rate amongst infants per 1000 live Births. Also minimum and maximum mortality rate recorded in these countries 
+```sql
+
+SELECT 
+country_name,
+avg(value) as Avg_Mortality_rate,
+MIN(value) AS Min_Mortality_rate,
+MAX(value) AS Max_Mortality_rate,
+FROM `bigquery-public-data.world_bank_health_population.health_nutrition_population` 
+where indicator_name ='Mortality rate, infant (per 1,000 live births)'
+group by country_name
+order by Avg_Mortality_rate desc
+
+```
+
+## Countries where minimum mortality rate is too high
+```sql
+
+SELECT 
+country_name,year,
+--avg(value) as Avg_Mortality_rate,
+MIN(value) AS Min_Mortality_rate
+--MAX(value) AS Max_Mortality_rate,
+FROM `bigquery-public-data.world_bank_health_population.health_nutrition_population` 
+where indicator_name ='Mortality rate, infant (per 1,000 live births)'
+group by country_name,year
+order by Min_Mortality_rate desc
+```
+
+#health expenditure of the company where mortality rate is higher than global average
+
+```sql
+
+with Avg_Mortality as (
+SELECT
+avg(value) as Avg_Mortality_rate
+FROM
+  `bigquery-public-data.world_bank_health_population.health_nutrition_population`
+where indicator_name = 'Mortality rate, infant (per 1,000 live births)'
+and year = 2017
+),
+
+list_of_countries as 
+(select 
+distinct (country_name),value 
+FROM
+  `bigquery-public-data.world_bank_health_population.health_nutrition_population`
+join Avg_Mortality  a
+on 1 = 1 
+where indicator_name = 'Mortality rate, infant (per 1,000 live births)'
+and year = 2017
+and value > a.Avg_Mortality_rate)
+
+select loc.country_name, world.value as health_expenditure_per_capita
+FROM list_of_countries loc 
+join `bigquery-public-data.world_bank_health_population.health_nutrition_population` world
+on world.country_name = loc.country_name 
+where indicator_name = 'Current health expenditure per capita (current US$)'
+and year = 2017
+order by health_expenditure_per_capita desc
+
+```
